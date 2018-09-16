@@ -325,6 +325,15 @@ struct Editor
   {
     (lincur) < (pos_janela.tamanho_linhas_tela - 1) ? lincur++ : 0;
   }
+  bool move_tela_cima()
+  {
+    if (lincur < pos_janela.y && pos_janela.y != 0)
+    {
+      pos_janela.y--;
+      return false;
+    }
+    return true;
+  }
 
   void move_tela_baixo()
   {
@@ -366,16 +375,17 @@ struct Editor
   {
     if (lincur + pos_janela.y > 0)
     {
-      int lengthAcima = strlen(linhas[lincur + pos_janela.y - 1]);
-      if (colcur + 1 < lengthAcima)
-        lincur--;
-      else
+      if (move_tela_cima())
       {
-        colcur = lengthAcima - 1;
-        lincur--;
+        int lengthAcima = strlen(linhas[lincur + pos_janela.y - 1]);
+        if (colcur + 1 < lengthAcima)
+          lincur--;
+        else
+        {
+          colcur = lengthAcima - 1;
+          lincur--;
+        }
       }
-      if (lincur == pos_janela.y && lincur != 0)
-        pos_janela.y--;
     }
   }
 
