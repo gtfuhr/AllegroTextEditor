@@ -326,6 +326,24 @@ struct Editor
     (lincur) < (pos_janela.tamanho_linhas_tela - 1) ? lincur++ : 0;
   }
 
+  void move_tela_baixo()
+  {
+    int finalTela = pos_janela.tamanho_linhas_tela + pos_janela.y;
+    if (lincur + pos_janela.y == finalTela - 1)
+      pos_janela.y++;
+  }
+
+  bool move_tela_baixo_quebra()
+  {
+    int finalTela = pos_janela.tamanho_linhas_tela + pos_janela.y;
+    if (lincur + pos_janela.y == finalTela - 1)
+    {
+      pos_janela.y++;
+      return true;
+    }
+    return false;
+  }
+
   void move_baixo()
   {
     int tam = tamanho();
@@ -340,10 +358,8 @@ struct Editor
       }
       else
         aumentaLincur();
-      int finalTela = pos_janela.tamanho_linhas_tela + pos_janela.y;
-      if (lincur + pos_janela.y == finalTela - 1)
-        pos_janela.y++;
     }
+    move_tela_baixo();
   }
 
   void move_cima()
@@ -470,9 +486,11 @@ struct Editor
     delete[] whole;
     linhas[lincurReal] = left_half;
     linhas.insert(linhas.begin() + lincurReal + 1, right_half);
-    lincur++;
     colcur = -1;
     pos_janela.x = 0;
+
+    if (!move_tela_baixo_quebra())
+      lincur++;
   }
 };
 
