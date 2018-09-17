@@ -265,6 +265,7 @@ struct Editor
         subtexto[i] = texto_exibido[i];
       subtexto[i] = '\0';
       tt = t.tamanho_texto(subtexto);
+      delete[] texto_exibido;
       delete[] subtexto;
     }
 
@@ -301,7 +302,7 @@ struct Editor
   {
     (colcur) < (pos_janela.qtd_char) ? colcur++ : 0;
 
-    if (colcur == pos_janela.qtd_char)
+    if (colcur == pos_janela.qtd_char - 1)
     {
       pos_janela.x++;
       colcur--;
@@ -311,9 +312,9 @@ struct Editor
   void move_dir()
   {
     int tam = strlen(linhas[lincur + pos_janela.y]);
-    if (colcur < tam - 1)
+    if (colcur < tam)
       aumentaColcur();
-    if (colcur + pos_janela.x == tam - 1 && lincur + pos_janela.y < tamanho() - 1)
+    if (colcur + pos_janela.x == tam && lincur + pos_janela.y < tamanho() - 1)
     {
       lincur++;
       colcur = -1;
@@ -338,14 +339,14 @@ struct Editor
   void move_tela_baixo()
   {
     int finalTela = pos_janela.tamanho_linhas_tela + pos_janela.y;
-    if (lincur + pos_janela.y == finalTela - 1)
+    if (lincur + pos_janela.y == finalTela - 1 && pos_janela.y + lincur + 1 < tamanho())
       pos_janela.y++;
   }
 
   bool move_tela_baixo_quebra()
   {
     int finalTela = pos_janela.tamanho_linhas_tela + pos_janela.y;
-    if (lincur + pos_janela.y == finalTela - 1)
+    if (lincur + pos_janela.y == finalTela - 1 && pos_janela.y + lincur + 1 < tamanho())
     {
       pos_janela.y++;
       return true;
@@ -384,6 +385,7 @@ struct Editor
         {
           colcur = lengthAcima - 1;
           lincur--;
+          pos_janela.x = 0;
         }
       }
     }
