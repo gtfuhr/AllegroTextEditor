@@ -178,12 +178,8 @@ struct Editor
     // fecha a tela
     t.finaliza();
     auto tam = tamanho();
-    std::string l;
     for (auto i = 0; i < tam; i++)
-    {
-      l = remove_linha(linhas[i]);
-      std::cout << "DEL: " << l << std::endl;
-    }
+      remove_linha(linhas[i]);
   }
   void fatia_string(char *inteira, char *fatia, int ini, int fim)
   {
@@ -232,18 +228,15 @@ struct Editor
     std::cout << " - CTRL+g gruda linha\n";
   }
 
-  void adiciona_linha(std::string linha)
+  void adiciona_linha(char *linha)
   {
-    char *linhaChar = new char[linha.length() + 1];
-    strcpy(linhaChar, linha.c_str());
-    linhas.push_back(linhaChar);
+    linhas.push_back(linha);
   }
 
-  std::string remove_linha(char *l)
+  void remove_linha(char *l)
   {
-    std::string retorno(l);
+    std::cout << "DEL: " << l << std::endl;
     delete[] l;
-    return retorno;
   }
 
   int tamanho(void)
@@ -364,6 +357,8 @@ struct Editor
       if (colcur + 1 > lengthAbaixo)
       {
         colcur = lengthAbaixo - 1;
+        if (pos_janela.x > 0)
+          pos_janela.x = lengthAbaixo;
         aumentaLincur();
       }
       else
@@ -391,26 +386,27 @@ struct Editor
     }
   }
 
-  void carrega(std::string arquivo)
+  void carrega(const char *arquivo)
   {
     std::string linha;
     std::ifstream entrada{arquivo};
     while (std::getline(entrada, linha))
     {
-      adiciona_linha(linha);
+      char *linhaChar = new char[linha.length() + 1];
+      strcpy(linhaChar, linha.c_str());
+      adiciona_linha(linhaChar);
     }
   }
 
-  void salva(std::string arquivo)
+  void salva(const char *arquivo)
   {
     std::ofstream saida{arquivo};
     auto tam = tamanho();
     saida.clear();
+
     for (auto i = 0; i < tam; i++)
-    {
-      std::string linha(linhas[i]);
-      saida << linha << std::endl;
-    }
+      saida << linhas[i] << std::endl;
+
     saida.close();
   }
 
@@ -468,14 +464,13 @@ struct Editor
     int lincurReal = lincur + pos_janela.y;
     if (lincurReal < tam)
     {
-      std::string s1(linhas[lincurReal]);
-      std::string s2(linhas[lincurReal + 1]);
+      char *linhaNova = new char[strlen(linhas[lincurReal]) + strlen(linhas[lincurReal + 1]) + 1];
+      strcpy(linhaNova, linhas[lincurReal]);
+      strcat(linhaNova, linhas[lincurReal + 1]);
       delete[] linhas[lincurReal];
       delete[] linhas[lincurReal + 1];
-      linhas[lincurReal] = new char[s1.size() + s2.size() + 1];
-      strcpy(linhas[lincurReal], s1.c_str());
-      strcat(linhas[lincurReal], s2.c_str());
       linhas.erase(linhas.begin() + lincurReal + 1);
+      linhas[lincurReal] = linhaNova;
     }
   }
 
@@ -509,16 +504,17 @@ struct Editor
 int main(int argc, char **argv)
 {
   Editor editor;
-
+  const char *texto = "texto.txt";
+  const char *saida = "saida.txt";
   editor.inicia(); //
-  editor.carrega("texto.txt");
+  editor.carrega(texto);
   editor.legenda();
 
   while (editor.verifica_fim() == false)
   {
     editor.atualiza();
   }
-  editor.salva("saida.txt");
+  editor.salva(saida);
   editor.finaliza();
 
   return 0;
