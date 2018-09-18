@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+#Meus arquivos ignorados
+saida.txt
